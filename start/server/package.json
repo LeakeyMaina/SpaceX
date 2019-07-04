@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
-    "start": "nodemon src/index.js",
-    "start:ci": "node src/index.js"
+    "start": "nodemon src/server.js",
+    "start:ci": "node src/server.js"
   },
   "author": "",
   "license": "ISC",

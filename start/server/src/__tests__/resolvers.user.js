@@ -1,17 +1,20 @@
-const resolvers = require('../resolvers');
+const resolvers = require("../resolvers");
 
-describe('[User.trips]', () => {
+const LaunchDataSource = require("../datasources/LaunchDataSource");
+const UserDataSource = require("../datasources/UserDataSource");
+
+describe("[User.trips]", () => {
   const mockContext = {
     dataSources: {
-      userAPI: { getLaunchIdsByUser: jest.fn() },
-      launchAPI: { getLaunchesByIds: jest.fn() },
+      UserDataSource: { getLaunchIdsByUser: jest.fn() },
+      LaunchDataSource: { getLaunchesByIds: jest.fn() }
     },
-    user: { id: 1 },
+    user: { id: 1 }
   };
-  const { getLaunchIdsByUser } = mockContext.dataSources.userAPI;
-  const { getLaunchesByIds } = mockContext.dataSources.launchAPI;
+  const { getLaunchIdsByUser } = mockContext.dataSources.UserDataSource;
+  const { getLaunchesByIds } = mockContext.dataSources.LaunchDataSource;
 
-  it('uses user id from context to lookup trips', async () => {
+  it("uses user id from context to lookup trips", async () => {
     getLaunchIdsByUser.mockReturnValueOnce([999]);
     getLaunchesByIds.mockReturnValueOnce([{ id: 999 }]);
 
@@ -24,7 +27,7 @@ describe('[User.trips]', () => {
     expect(getLaunchesByIds).toBeCalledWith({ launchIds: [999] });
   });
 
-  it('returns empty array if no response', async () => {
+  it("returns empty array if no response", async () => {
     getLaunchIdsByUser.mockReturnValueOnce([]);
     getLaunchesByIds.mockReturnValueOnce([]);
 

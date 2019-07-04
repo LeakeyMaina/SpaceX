@@ -22,16 +22,16 @@ jobs:
 
     steps:
       - checkout
-      - run: cd final/server && npm ci
-      - run: cd final/server && npm test
+      - run: cd start/server && npm ci
+      - run: cd start/server && npm test
 
       - run:
           name: Starting server
-          command: cd final/server && npm run start:ci
+          command: cd start/server && npm run start:ci
           background: true
 
       - run: sleep 5
-      - run: cd final/server && npx apollo service:check
+      - run: cd start/server && npx apollo service:check
 
       - run: |
           if [ "${CIRCLE_BRANCH}" == "master" ]; then

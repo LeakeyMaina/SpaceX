@@ -69,15 +69,15 @@ describe('Queries', () => {
     // existing dataSources, resolvers, and typeDefs.
     // This function returns the server instance as well as our dataSource
     // instances, so we can overwrite the underlying fetchers
-    const { server, launchAPI, userAPI } = constructTestServer({
+    const { server, LaunchDataSource, UserDataSource } = constructTestServer({
       context: () => ({ user: { id: 1, email: 'a@a.a' } }),
     });
 
     // mock the datasources' underlying fetch methods, whether that's a REST
     // lookup in the RESTDataSource or the store query in the Sequelize datasource
-    launchAPI.get = jest.fn(() => [mockLaunchResponse]);
-    userAPI.store = mockStore;
-    userAPI.store.trips.findAll.mockReturnValueOnce([
+    LaunchDataSource.get = jest.fn(() => [mockLaunchResponse]);
+    UserDataSource.store = mockStore;
+    UserDataSource.store.trips.findAll.mockReturnValueOnce([
       { dataValues: { launchId: 1 } },
     ]);
 
@@ -90,13 +90,13 @@ describe('Queries', () => {
   });
 
   it('fetches single launch', async () => {
-    const { server, launchAPI, userAPI } = constructTestServer({
+    const { server, LaunchDataSource, UserDataSource } = constructTestServer({
       context: () => ({ user: { id: 1, email: 'a@a.a' } }),
     });
 
-    launchAPI.get = jest.fn(() => [mockLaunchResponse]);
-    userAPI.store = mockStore;
-    userAPI.store.trips.findAll.mockReturnValueOnce([
+    LaunchDataSource.get = jest.fn(() => [mockLaunchResponse]);
+    UserDataSource.store = mockStore;
+    UserDataSource.store.trips.findAll.mockReturnValueOnce([
       { dataValues: { launchId: 1 } },
     ]);
 
@@ -108,12 +108,12 @@ describe('Queries', () => {
 
 describe('Mutations', () => {
   it('returns login token', async () => {
-    const { server, launchAPI, userAPI } = constructTestServer({
+    const { server, LaunchDataSource, UserDataSource } = constructTestServer({
       context: () => {},
     });
 
-    userAPI.store = mockStore;
-    userAPI.store.users.findOrCreate.mockReturnValueOnce([
+    UserDataSource.store = mockStore;
+    UserDataSource.store.users.findOrCreate.mockReturnValueOnce([
       { id: 1, email: 'a@a.a' },
     ]);
 
@@ -126,26 +126,26 @@ describe('Mutations', () => {
   });
 
   it('books trips', async () => {
-    const { server, launchAPI, userAPI } = constructTestServer({
+    const { server, LaunchDataSource, UserDataSource } = constructTestServer({
       context: () => ({ user: { id: 1, email: 'a@a.a' } }),
     });
 
     // mock the underlying fetches
-    launchAPI.get = jest.fn();
+    LaunchDataSource.get = jest.fn();
 
     // look up the launches from the launch API
-    launchAPI.get
+    LaunchDataSource.get
       .mockReturnValueOnce([mockLaunchResponse])
       .mockReturnValueOnce([{ ...mockLaunchResponse, flight_number: 2 }]);
 
     // book the trip in the store
-    userAPI.store = mockStore;
-    userAPI.store.trips.findOrCreate
+    UserDataSource.store = mockStore;
+    UserDataSource.store.trips.findOrCreate
       .mockReturnValueOnce([{ get: () => ({ launchId: 1 }) }])
       .mockReturnValueOnce([{ get: () => ({ launchId: 2 }) }]);
 
     // check if user is booked
-    userAPI.store.trips.findAll.mockReturnValue([{}]);
+    UserDataSource.store.trips.findAll.mockReturnValue([{}]);
 
     const { mutate } = createTestClient(server);
     const res = await mutate({

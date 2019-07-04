@@ -1,102 +1,102 @@
-const resolvers = require('../resolvers');
+const resolvers = require("../resolvers");
 
-describe('[Query.launches]', () => {
+describe("[Query.launches]", () => {
   const mockContext = {
     dataSources: {
-      launchAPI: { getAllLaunches: jest.fn() },
-    },
+      LaunchDataSource: { getAllLaunches: jest.fn() }
+    }
   };
   // just for easy access
-  const { getAllLaunches } = mockContext.dataSources.launchAPI;
+  const { getAllLaunches } = mockContext.dataSources.LaunchDataSource;
 
-  it('calls lookup from launch api', async () => {
+  it("calls lookup from launch api", async () => {
     // NOTE: these results get reversed in the resolver
-    getAllLaunches.mockReturnValueOnce([{ id: 999, cursor: 'foo' }]);
+    getAllLaunches.mockReturnValueOnce([{ id: 999, cursor: "foo" }]);
 
     // check the resolver response
     const res = await resolvers.Query.launches(null, {}, mockContext);
     expect(res).toEqual({
-      cursor: 'foo',
+      cursor: "foo",
       hasMore: false,
-      launches: [{ id: 999, cursor: 'foo' }],
+      launches: [{ id: 999, cursor: "foo" }]
     });
   });
 
-  it('respects pageSize arg', async () => {
+  it("respects pageSize arg", async () => {
     // NOTE: these results get reversed in the resolver
     getAllLaunches.mockReturnValue([
-      { id: 1, cursor: 'foo' },
-      { id: 999, cursor: 'bar' },
+      { id: 1, cursor: "foo" },
+      { id: 999, cursor: "bar" }
     ]);
 
     // check the resolver response
     const res = await resolvers.Query.launches(
       null,
       { pageSize: 1 },
-      mockContext,
+      mockContext
     );
     expect(res).toEqual({
-      cursor: 'bar',
+      cursor: "bar",
       hasMore: true,
-      launches: [{ id: 999, cursor: 'bar' }],
+      launches: [{ id: 999, cursor: "bar" }]
     });
   });
 
-  it('respects cursor arg', async () => {
+  it("respects cursor arg", async () => {
     // NOTE: these results get reversed in the resolver
     getAllLaunches.mockReturnValueOnce([
-      { id: 1, cursor: 'a' },
-      { id: 999, cursor: 'b' },
+      { id: 1, cursor: "a" },
+      { id: 999, cursor: "b" }
     ]);
 
     // check the resolver response
     const res = await resolvers.Query.launches(
       null,
-      { after: 'b' },
-      mockContext,
+      { after: "b" },
+      mockContext
     );
 
     expect(res).toEqual({
       hasMore: false,
-      cursor: 'a',
-      launches: [{ id: 1, cursor: 'a' }],
+      cursor: "a",
+      launches: [{ id: 1, cursor: "a" }]
     });
   });
 
-  it('respects both pageSize and cursor', async () => {
+  it("respects both pageSize and cursor", async () => {
     // NOTE: these results get reversed in the resolver
     getAllLaunches.mockReturnValue([
-      { id: 1, cursor: 'a' },
-      { id: 999, cursor: 'b' },
-      { id: 123, cursor: 'c' },
+      { id: 1, cursor: "a" },
+      { id: 999, cursor: "b" },
+      { id: 123, cursor: "c" }
     ]);
 
     // check the resolver response
     const res = await resolvers.Query.launches(
       null,
-      { after: 'c', pageSize: 1 },
-      mockContext,
+      { after: "c", pageSize: 1 },
+      mockContext
     );
 
     expect(res).toEqual({
-      cursor: 'b',
+      cursor: "b",
       hasMore: true,
-      launches: [{ id: 999, cursor: 'b' }],
+      launches: [{ id: 999, cursor: "b" }]
     });
   });
 });
 
-describe('[Query.launch]', () => {
+describe("[Query.launch]", () => {
   const mockContext = {
     dataSources: {
-      launchAPI: { getLaunchById: jest.fn() },
-    },
+      LaunchDataSource: { getLaunchById: jest.fn() }
+    }
   };
 
-  it('calls lookup from launch api', async () => {
-    const getLaunchById = mockContext.dataSources.launchAPI.getLaunchById;
+  it("calls lookup from launch api", async () => {
+    const getLaunchById = mockContext.dataSources.LaunchDataSource.getLaunchById;
     getLaunchById.mockReturnValueOnce({
-      id: 999,
+      id: 999
     });
 
     // check the resolver response
@@ -108,27 +108,28 @@ describe('[Query.launch]', () => {
   });
 });
 
-describe('[Query.me]', () => {
+describe("[Query.me]", () => {
   const mockContext = {
     dataSources: {
-      userAPI: { findOrCreateUser: jest.fn() },
+      UserDataSource: { findOrCreateUser: jest.fn() }
     },
-    user: {},
+    user: {}
   };
 
-  it('returns null if no user in context', async () => {
+  it("returns null if no user in context", async () => {
     expect(await resolvers.Query.me(null, null, mockContext)).toBeFalsy();
   });
 
-  it('returns user from userAPI', async () => {
-    mockContext.user.email = 'a@a.a';
-    const findOrCreateUser = mockContext.dataSources.userAPI.findOrCreateUser;
+  it("returns user from UserDataSource", async () => {
+    mockContext.user.email = "a@a.a";
+    const findOrCreateUser =
+      mockContext.dataSources.UserDataSource.findOrCreateUser;
     findOrCreateUser.mockReturnValueOnce({ id: 999 });
 
     // check return value of resolver
     const res = await resolvers.Query.me(null, null, mockContext);
     expect(res).toEqual({
-      id: 999,
+      id: 999
     });
   });
 });
