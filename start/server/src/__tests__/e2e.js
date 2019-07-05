@@ -1,5 +1,5 @@
 // import our production apollo-server instance
-const { server } = require('../');
+const { server }  = require('../server');
 const gql = require('graphql-tag');
 
 const { startTestServer, toPromise } = require('./__utils');
