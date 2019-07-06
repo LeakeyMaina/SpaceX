@@ -1,6 +1,6 @@
-const { HttpLink } = require("apollo-link-http");
-const fetch = require("node-fetch");
-const { execute, toPromise } = require("apollo-link");
+const { HttpLink } = require('apollo-link-http');
+const fetch = require('node-fetch');
+const { execute, toPromise } = require('apollo-link');
 
 module.exports.toPromise = toPromise;
 
@@ -10,26 +10,26 @@ const {
   typeDefs,
   resolvers,
   ApolloServer,
-  LaunchDataSource,
-  UserDataSource,
-  store
-} = require("../");
+  LaunchAPI,
+  UserAPI,
+  store,
+} = require('../');
 
 /**
  * Integration testing utils
  */
 const constructTestServer = ({ context = defaultContext } = {}) => {
-  const UserDataSource = new UserDataSource({ store });
-  const LaunchDataSource = new LaunchDataSource();
+  const userAPI = new UserAPI({ store });
+  const launchAPI = new LaunchAPI();
 
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    dataSources: () => ({ UserDataSource, LaunchDataSource }),
-    context
+    dataSources: () => ({ userAPI, launchAPI }),
+    context,
   });
 
-  return { server, UserDataSource, LaunchDataSource };
+  return { server, userAPI, launchAPI };
 };
 
 module.exports.constructTestServer = constructTestServer;
@@ -48,7 +48,7 @@ const startTestServer = async server => {
 
   const link = new HttpLink({
     uri: `http://localhost:${httpServer.port}`,
-    fetch
+    fetch,
   });
 
   const executeOperation = ({ query, variables = {} }) =>
@@ -57,7 +57,7 @@ const startTestServer = async server => {
   return {
     link,
     stop: () => httpServer.server.close(),
-    graphql: executeOperation
+    graphql: executeOperation,
   };
 };
 
